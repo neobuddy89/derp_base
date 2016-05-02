@@ -6565,6 +6565,15 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_ACTIVITY_INDICATORS =
                  "status_bar_show_activity_indicators";
 
+       /**
+         * Should we listen for fingerprints when the screen is off?  Devices
+         * with a rear-mounted sensor want this, but certain devices have
+         * the sensor embedded in the power key and listening all the time
+         * causes a poor experience.
+         * @hide
+         */
+        public static final String FP_WAKE_UNLOCK = "fp_wake_unlock";
+
         /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
@@ -6767,6 +6776,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(HIGH_TOUCH_SENSITIVITY_ENABLE);
             PRIVATE_SETTINGS.add(BATTERY_LEVEL_COLORS);
             PRIVATE_SETTINGS.add(VOLTE_VOWIFI_OVERRIDE);
+            PRIVATE_SETTINGS.add(FP_WAKE_UNLOCK);
         }
 
         /**

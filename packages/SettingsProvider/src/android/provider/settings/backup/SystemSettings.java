@@ -153,5 +153,6 @@ public class SystemSettings {
         Settings.System.BATTERY_LEVEL_COLORS,
         Settings.System.VOLTE_VOWIFI_OVERRIDE,
         Settings.System.STATUS_BAR_SHOW_ACTIVITY_INDICATORS,
+        Settings.System.FP_WAKE_UNLOCK
     };
 }
