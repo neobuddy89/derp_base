@@ -6580,6 +6580,14 @@ public final class Settings {
         public static final String BLUR_STYLE_PREFERENCE_KEY = "blur_style";
 
         /**
+         * Whether to display activity indicators on wifi and mobile icons
+         *
+         * @hide
+         */
+        public static final String STATUS_BAR_SHOW_ACTIVITY_INDICATORS =
+                 "status_bar_show_activity_indicators";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
