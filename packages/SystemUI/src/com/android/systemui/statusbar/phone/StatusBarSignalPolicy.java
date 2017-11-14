@@ -55,6 +55,8 @@ public class StatusBarSignalPolicy implements SignalCallback,
             "system:" + Settings.System.USE_OLD_MOBILETYPE;
 
     private static final String HIDE_QS_CALL_STRENGTH = "hide_qs_call_strength";
+    private static final String SHOW_ACTIVITY_INDICATORS =
+            "system:" + Settings.System.STATUS_BAR_SHOW_ACTIVITY_INDICATORS;
 
     private final String mSlotAirplane;
     private final String mSlotMobile;
@@ -126,7 +128,7 @@ public class StatusBarSignalPolicy implements SignalCallback,
         }
         mInitialized = true;
         mTunerService.addTunable(this, StatusBarIconController.ICON_HIDE_LIST,
-                USE_OLD_MOBILETYPE, HIDE_QS_CALL_STRENGTH);
+                USE_OLD_MOBILETYPE, HIDE_QS_CALL_STRENGTH, SHOW_ACTIVITY_INDICATORS);
         mNetworkController.addCallback(this);
         mSecurityController.addCallback(this);
     }
@@ -164,23 +166,27 @@ public class StatusBarSignalPolicy implements SignalCallback,
             mNetworkController.removeCallback(this);
             mNetworkController.addCallback(this);
         }
-        if (!StatusBarIconController.ICON_HIDE_LIST.equals(key)) {
-            return;
-        }
-        ArraySet<String> hideList = StatusBarIconController.getIconHideList(mContext, newValue);
-        boolean hideAirplane = hideList.contains(mSlotAirplane);
-        boolean hideMobile = hideList.contains(mSlotMobile);
-        boolean hideWifi = hideList.contains(mSlotWifi);
-        boolean hideEthernet = hideList.contains(mSlotEthernet);
-        boolean hideVpn = hideList.contains(mSlotVpn);
+        if (StatusBarIconController.ICON_HIDE_LIST.equals(key)) {
+            ArraySet<String> hideList = StatusBarIconController.getIconHideList(mContext, newValue);
+            boolean hideAirplane = hideList.contains(mSlotAirplane);
+            boolean hideMobile = hideList.contains(mSlotMobile);
+            boolean hideWifi = hideList.contains(mSlotWifi);
+            boolean hideEthernet = hideList.contains(mSlotEthernet);
+            boolean hideVpn = hideList.contains(mSlotVpn);
 
-        if (hideAirplane != mHideAirplane || hideMobile != mHideMobile
-                || hideEthernet != mHideEthernet || hideWifi != mHideWifi || hideVpn != mHideVpn) {
-            mHideAirplane = hideAirplane;
-            mHideMobile = hideMobile;
-            mHideEthernet = hideEthernet;
-            mHideWifi = hideWifi;
-            mHideVpn = hideVpn;
+            if (hideAirplane != mHideAirplane || hideMobile != mHideMobile
+                    || hideEthernet != mHideEthernet || hideWifi != mHideWifi || hideVpn != mHideVpn) {
+                mHideAirplane = hideAirplane;
+                mHideMobile = hideMobile;
+                mHideEthernet = hideEthernet;
+                mHideWifi = hideWifi;
+                mHideVpn = hideVpn;
+                // Re-register to get new callbacks.
+                mNetworkController.removeCallback(this);
+                mNetworkController.addCallback(this);
+            }
+        } else if (SHOW_ACTIVITY_INDICATORS.equals(key)) {
+            mActivityEnabled = TunerService.parseIntegerSwitch(newValue, true);
             // Re-register to get new callbacks.
             mNetworkController.removeCallback(this);
             mNetworkController.addCallback(this);

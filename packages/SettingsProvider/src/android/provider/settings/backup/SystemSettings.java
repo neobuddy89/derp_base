@@ -152,5 +152,6 @@ public class SystemSettings {
         Settings.System.SCREEN_OFF_FOD,
         Settings.System.BATTERY_LEVEL_COLORS,
         Settings.System.VOLTE_VOWIFI_OVERRIDE,
+        Settings.System.STATUS_BAR_SHOW_ACTIVITY_INDICATORS,
     };
 }
