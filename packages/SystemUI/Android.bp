@@ -87,6 +87,7 @@ android_library {
         "res-product",
         "res-keyguard",
         "res-smartspace",
+        "res-elmyra",
     ],
     static_libs: [
         "WindowManager-Shell",
