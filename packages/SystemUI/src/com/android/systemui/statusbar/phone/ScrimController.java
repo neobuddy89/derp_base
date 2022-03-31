@@ -26,6 +26,7 @@ import android.app.AlarmManager;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Trace;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.MathUtils;
 import android.util.Pair;
@@ -59,6 +60,7 @@ import com.android.systemui.statusbar.policy.KeyguardStateController;
 import com.android.systemui.util.AlarmTimeout;
 import com.android.systemui.util.wakelock.DelayedWakeLock;
 import com.android.systemui.util.wakelock.WakeLock;
+import com.android.systemui.util.settings.SecureSettings;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -66,6 +68,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 
 import javax.inject.Inject;
 
@@ -228,6 +233,8 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
     private final WakeLock mWakeLock;
     private boolean mWakeLockHeld;
     private boolean mKeyguardOccluded;
+    
+    private final SecureSettings mSecureSettings;
 
     @Inject
     public ScrimController(LightBarController lightBarController, DozeParameters dozeParameters,
@@ -236,9 +243,11 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
             KeyguardUpdateMonitor keyguardUpdateMonitor, DockManager dockManager,
             ConfigurationController configurationController, @Main Executor mainExecutor,
             UnlockedScreenOffAnimationController unlockedScreenOffAnimationController,
-            PanelExpansionStateManager panelExpansionStateManager) {
+            PanelExpansionStateManager panelExpansionStateManager, SecureSettings secureSettings) {
         mScrimStateListener = lightBarController::setScrimState;
         mDefaultScrimAlpha = BUSY_SCRIM_ALPHA;
+        
+        mSecureSettings = secureSettings;
 
         mKeyguardStateController = keyguardStateController;
         mDarkenWhileDragging = !mKeyguardStateController.canDismissLockScreen();
@@ -289,7 +298,7 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
         mScrimBehind = behindScrim;
         mScrimInFront = scrimInFront;
         updateThemeColors();
-
+        
         behindScrim.enableBottomEdgeConcave(mClipsQsScrim);
         mNotificationsScrim.enableRoundedCorners(true);
 
@@ -953,7 +962,17 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
     }
 
     private void updateScrimColor(View scrim, float alpha, int tint) {
-        alpha = Math.max(0, Math.min(1.0f, alpha));
+    	boolean isNusantaraClearTheme = mSecureSettings.getInt(Settings.Secure.SYSTEM_NUSANTARA_THEME, 0) == 1;
+        if (isNusantaraClearTheme) {
+        	alpha = Math.max(0, Math.min(0.7f, alpha));
+        	mScrimBehind.setRenderEffect(RenderEffect.createBlurEffect(
+                 30f, //radius X
+                 30f, //Radius Y
+                 Shader.TileMode.MIRROR));// X=CLAMP,DECAL,MIRROR,REPEAT
+        } else {
+        	alpha = Math.max(0, Math.min(1.0f, alpha));
+        }
+        
         if (scrim instanceof ScrimView) {
             ScrimView scrimView = (ScrimView) scrim;
 

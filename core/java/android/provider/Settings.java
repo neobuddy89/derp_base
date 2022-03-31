@@ -11844,6 +11844,12 @@ public final class Settings {
         public static final String SYSTEM_BLACK_THEME = "system_black_theme";
 
         /**
+         * Whether to turn on nusantara theme
+         * @hide
+         */
+        public static final String SYSTEM_NUSANTARA_THEME = "system_nusantara_theme";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
