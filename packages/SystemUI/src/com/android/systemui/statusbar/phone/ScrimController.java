@@ -154,7 +154,7 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
      * The default scrim under the shade and dialogs.
      * This should not be lower than 0.54, otherwise we won't pass GAR.
      */
-    public static final float BUSY_SCRIM_ALPHA = 1f;
+    public static final float BUSY_SCRIM_ALPHA = 0.9f;
 
     /**
      * Scrim opacity that can have text on top.
@@ -964,11 +964,11 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
     private void updateScrimColor(View scrim, float alpha, int tint) {
     	boolean isNusantaraClearTheme = mSecureSettings.getInt(Settings.Secure.SYSTEM_NUSANTARA_THEME, 0) == 1;
         if (isNusantaraClearTheme) {
-        	alpha = Math.max(0, Math.min(0.7f, alpha));
-        	mScrimBehind.setRenderEffect(RenderEffect.createBlurEffect(
-                 30f, //radius X
-                 30f, //Radius Y
-                 Shader.TileMode.MIRROR));// X=CLAMP,DECAL,MIRROR,REPEAT
+        	alpha = Math.max(0, Math.min(0.8f, alpha));
+        	mNotificationsScrim.setRenderEffect(RenderEffect.createBlurEffect(
+                 90f, //radius X
+                 90f, //Radius Y
+                 Shader.TileMode.CLAMP));// X=CLAMP,DECAL,MIRROR,REPEAT
         } else {
         	alpha = Math.max(0, Math.min(1.0f, alpha));
         }
