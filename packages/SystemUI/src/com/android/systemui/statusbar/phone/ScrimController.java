@@ -154,7 +154,9 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
      * The default scrim under the shade and dialogs.
      * This should not be lower than 0.54, otherwise we won't pass GAR.
      */
-    public static final float BUSY_SCRIM_ALPHA = 0.9f;
+    public static final float BUSY_SCRIM_ALPHA = 1f;
+    
+    public static final float BUSY_SCRIM_ALPHA_2 = 0.9f;
 
     /**
      * Scrim opacity that can have text on top.
@@ -245,9 +247,13 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
             UnlockedScreenOffAnimationController unlockedScreenOffAnimationController,
             PanelExpansionStateManager panelExpansionStateManager, SecureSettings secureSettings) {
         mScrimStateListener = lightBarController::setScrimState;
-        mDefaultScrimAlpha = BUSY_SCRIM_ALPHA;
-        
         mSecureSettings = secureSettings;
+        boolean isNusantaraClearTheme = mSecureSettings.getInt(Settings.Secure.SYSTEM_NUSANTARA_THEME, 0) == 1;
+        if (isNusantaraClearTheme) {
+            mDefaultScrimAlpha = BUSY_SCRIM_ALPHA_2;
+        } else {
+            mDefaultScrimAlpha = BUSY_SCRIM_ALPHA;
+        }
 
         mKeyguardStateController = keyguardStateController;
         mDarkenWhileDragging = !mKeyguardStateController.canDismissLockScreen();
@@ -970,7 +976,8 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
                  90f, //Radius Y
                  Shader.TileMode.CLAMP));// X=CLAMP,DECAL,MIRROR,REPEAT
         } else {
-        	alpha = Math.max(0, Math.min(1.0f, alpha));
+            alpha = Math.max(0, Math.min(1.0f, alpha));
+            mNotificationsScrim.setRenderEffect(null);
         }
         
         if (scrim instanceof ScrimView) {
