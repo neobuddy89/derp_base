@@ -39,6 +39,8 @@ import com.android.systemui.navigationbar.NavigationModeController;
 import com.android.systemui.plugins.DarkIconDispatcher;
 import com.android.systemui.statusbar.policy.BatteryController;
 
+import android.os.Handler;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
@@ -56,8 +58,15 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
     private final BatteryController mBatteryController;
     private BiometricUnlockController mBiometricUnlockController;
 
+    private Handler mHandler = new Handler();
+    private int mNavigationBarOverrideIconColor;
+    private int mPreviousOverrideNavigationBarIconColor;
+    private int mPreviousOverrideStatusBarIconColor;
+    private int mStatusBarOverrideIconColor;
+
     private LightBarTransitionsController mNavigationBarController;
-    private @Appearance int mAppearance;
+    private @Appearance
+    int mAppearance;
     private AppearanceRegion[] mAppearanceRegions = new AppearanceRegion[0];
     private int mStatusBarMode;
     private int mNavigationBarMode;
@@ -104,6 +113,37 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
         if (ctx.getDisplayId() == DEFAULT_DISPLAY) {
             dumpManager.registerDumpable(getClass().getSimpleName(), this);
         }
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+            public void onUpdateStatusBarIconColor(int previousIconColor, int iconColor) {
+                mPreviousOverrideStatusBarIconColor = previousIconColor;
+                mStatusBarOverrideIconColor = iconColor;
+                updateStatusIcon();
+            }
+
+            public void onUpdateNavigationBarIconColor(int previousIconColor, int iconColor) {
+                mPreviousOverrideNavigationBarIconColor = previousIconColor;
+                mNavigationBarOverrideIconColor = iconColor;
+                updateNavigationIcon();
+            }
+        });
+    }
+
+    public void updateNavigationIcon() {
+        mHandler.post(() -> {
+            if (BarBackgroundUpdater.mNavigationEnabled) {
+                if (mNavigationBarController != null) {
+                    mNavigationBarController.setIconsDark(mNavigationBarOverrideIconColor != -1, animateChange());
+                }
+            }
+        });
+    }
+
+    public void updateStatusIcon() {
+        mHandler.post(() -> {
+            if (BarBackgroundUpdater.mStatusEnabled) {
+                mStatusBarIconController.getTransitionsController().setIconsDark(mStatusBarOverrideIconColor != -1, animateChange());
+            }
+        });
     }
 
     public void setNavigationBar(LightBarTransitionsController navigationBar) {
@@ -117,7 +157,7 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
     }
 
     void onStatusBarAppearanceChanged(AppearanceRegion[] appearanceRegions, boolean sbModeChanged,
-            int statusBarMode, boolean navbarColorManagedByIme) {
+                                      int statusBarMode, boolean navbarColorManagedByIme) {
         final int numStacks = appearanceRegions.length;
         boolean stackAppearancesChanged = mAppearanceRegions.length != numStacks;
         for (int i = 0; i < numStacks && !stackAppearancesChanged; i++) {
@@ -136,7 +176,7 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
     }
 
     public void onNavigationBarAppearanceChanged(@Appearance int appearance, boolean nbModeChanged,
-            int navigationBarMode, boolean navbarColorManagedByIme) {
+                                                 int navigationBarMode, boolean navbarColorManagedByIme) {
         int diff = appearance ^ mAppearance;
         if ((diff & APPEARANCE_LIGHT_NAVIGATION_BARS) != 0 || nbModeChanged) {
             final boolean last = mNavigationLight;
@@ -173,6 +213,7 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
 
     /**
      * Sets whether the direct-reply is in use or not.
+     *
      * @param directReplying {@code true} when the direct-reply is in-use.
      */
     public void setDirectReplying(boolean directReplying) {
@@ -182,7 +223,7 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
     }
 
     public void setScrimState(ScrimState scrimState, float scrimBehindAlpha,
-            GradientColors scrimInFrontColor) {
+                              GradientColors scrimInFrontColor) {
         boolean forceDarkForScrimLast = mForceDarkForScrim;
         // For BOUNCER/BOUNCER_SCRIMMED cases, we assume that alpha is always below threshold.
         // This enables IMEs to control the navigation bar color.
@@ -213,44 +254,47 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
     }
 
     private void updateStatus() {
-        final int numStacks = mAppearanceRegions.length;
-        int numLightStacks = 0;
+        if (!BarBackgroundUpdater.mStatusEnabled) {
+            final int numStacks = mAppearanceRegions.length;
+            int numLightStacks = 0;
 
-        // We can only have maximum one light stack.
-        int indexLightStack = -1;
+            // We can only have maximum one light stack.
+            int indexLightStack = -1;
 
-        for (int i = 0; i < numStacks; i++) {
-            if (isLight(mAppearanceRegions[i].getAppearance(), mStatusBarMode,
-                    APPEARANCE_LIGHT_STATUS_BARS)) {
-                numLightStacks++;
-                indexLightStack = i;
+            for (int i = 0; i < numStacks; i++) {
+                if (isLight(mAppearanceRegions[i].getAppearance(), mStatusBarMode,
+                        APPEARANCE_LIGHT_STATUS_BARS)) {
+                    numLightStacks++;
+                    indexLightStack = i;
+                }
             }
-        }
 
-        // If no one is light, all icons become white.
-        if (numLightStacks == 0) {
-            mStatusBarIconController.getTransitionsController().setIconsDark(
-                    false, animateChange());
-        }
+            // If no one is light, all icons become white.
+            if (numLightStacks == 0) {
+                mStatusBarIconController.getTransitionsController().setIconsDark(
+                        false, animateChange());
+            }
 
-        // If all stacks are light, all icons get dark.
-        else if (numLightStacks == numStacks) {
-            mStatusBarIconController.setIconsDarkArea(null);
-            mStatusBarIconController.getTransitionsController().setIconsDark(true, animateChange());
+            // If all stacks are light, all icons get dark.
+            else if (numLightStacks == numStacks) {
+                mStatusBarIconController.setIconsDarkArea(null);
+                mStatusBarIconController.getTransitionsController().setIconsDark(true, animateChange());
 
-        }
+            }
 
-        // Not the same for every stack, magic!
-        else {
-            mStatusBarIconController.setIconsDarkArea(
-                    mAppearanceRegions[indexLightStack].getBounds());
-            mStatusBarIconController.getTransitionsController().setIconsDark(true, animateChange());
+            // Not the same for every stack, magic!
+            else {
+                mStatusBarIconController.setIconsDarkArea(
+                        mAppearanceRegions[indexLightStack].getBounds());
+                mStatusBarIconController.getTransitionsController().setIconsDark(true, animateChange());
+            }
         }
     }
 
     private void updateNavigation() {
         if (mNavigationBarController != null
-                && mNavigationBarController.supportsIconTintForNavMode(mNavigationMode)) {
+                && mNavigationBarController.supportsIconTintForNavMode(mNavigationMode)
+                && !BarBackgroundUpdater.mNavigationEnabled) {
             mNavigationBarController.setIconsDark(mNavigationLight, animateChange());
         }
     }
@@ -263,26 +307,39 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
     @Override
     public void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
         pw.println("LightBarController: ");
-        pw.print(" mAppearance="); pw.println(ViewDebug.flagsToString(
+        pw.print(" mAppearance=");
+        pw.println(ViewDebug.flagsToString(
                 InsetsFlags.class, "appearance", mAppearance));
         final int numStacks = mAppearanceRegions.length;
         for (int i = 0; i < numStacks; i++) {
             final boolean isLight = isLight(mAppearanceRegions[i].getAppearance(), mStatusBarMode,
                     APPEARANCE_LIGHT_STATUS_BARS);
-            pw.print(" stack #"); pw.print(i); pw.print(": ");
-            pw.print(mAppearanceRegions[i].toString()); pw.print(" isLight="); pw.println(isLight);
+            pw.print(" stack #");
+            pw.print(i);
+            pw.print(": ");
+            pw.print(mAppearanceRegions[i].toString());
+            pw.print(" isLight=");
+            pw.println(isLight);
         }
 
-        pw.print(" mNavigationLight="); pw.print(mNavigationLight);
-        pw.print(" mHasLightNavigationBar="); pw.println(mHasLightNavigationBar);
+        pw.print(" mNavigationLight=");
+        pw.print(mNavigationLight);
+        pw.print(" mHasLightNavigationBar=");
+        pw.println(mHasLightNavigationBar);
 
-        pw.print(" mStatusBarMode="); pw.print(mStatusBarMode);
-        pw.print(" mNavigationBarMode="); pw.println(mNavigationBarMode);
+        pw.print(" mStatusBarMode=");
+        pw.print(mStatusBarMode);
+        pw.print(" mNavigationBarMode=");
+        pw.println(mNavigationBarMode);
 
-        pw.print(" mForceDarkForScrim="); pw.print(mForceDarkForScrim);
-        pw.print(" mQsCustomizing="); pw.print(mQsCustomizing);
-        pw.print(" mDirectReplying="); pw.println(mDirectReplying);
-        pw.print(" mNavbarColorManagedByIme="); pw.println(mNavbarColorManagedByIme);
+        pw.print(" mForceDarkForScrim=");
+        pw.print(mForceDarkForScrim);
+        pw.print(" mQsCustomizing=");
+        pw.print(mQsCustomizing);
+        pw.print(" mDirectReplying=");
+        pw.println(mDirectReplying);
+        pw.print(" mNavbarColorManagedByIme=");
+        pw.println(mNavbarColorManagedByIme);
 
         pw.println();
 
@@ -323,7 +380,9 @@ public class LightBarController implements BatteryController.BatteryStateChangeC
             mDumpManager = dumpManager;
         }
 
-        /** Create an {@link LightBarController} */
+        /**
+         * Create an {@link LightBarController}
+         */
         public LightBarController create(Context context) {
             return new LightBarController(context, mDarkIconDispatcher, mBatteryController,
                     mNavModeController, mDumpManager);

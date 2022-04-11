@@ -178,6 +178,7 @@ import com.android.systemui.keyguard.ScreenLifecycle;
 import com.android.systemui.keyguard.WakefulnessLifecycle;
 import com.android.systemui.navigationbar.NavigationBarController;
 import com.android.systemui.navigationbar.NavigationBarView;
+import com.android.systemui.derp.ResourceUtils;
 import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.plugins.DarkIconDispatcher;
 import com.android.systemui.plugins.FalsingManager;
@@ -580,6 +581,7 @@ public class StatusBar extends SystemUI implements
     private View mReportRejectedTouch;
 
     private boolean mExpandedVisible;
+	public static boolean mExpandedDsb;
 
     private final int[] mAbsPos = new int[2];
 
@@ -1226,6 +1228,10 @@ public class StatusBar extends SystemUI implements
         updateDisplaySize(); // populates mDisplayMetrics
         updateResources();
         updateTheme();
+        
+        Context ctx = mContext;
+        String name = ctx.getPackageName();
+        ResourceUtils.init(name, ctx);
 
         inflateStatusBarWindow();
         mNotificationShadeWindowViewController.setService(this, mNotificationShadeWindowController);
@@ -2343,6 +2349,8 @@ public class StatusBar extends SystemUI implements
 
         mExpandedVisible = true;
 
+        mExpandedDsb = true;
+
         // Expand the window to encompass the full screen in anticipation of the drag.
         // This is only possible to do atomically because the status bar is at the top of the screen!
         mNotificationShadeWindowController.setPanelVisible(true);
@@ -2411,6 +2419,8 @@ public class StatusBar extends SystemUI implements
         mNotificationPanelViewController.closeQs();
 
         mExpandedVisible = false;
+        mExpandedDsb = false;
+
         visibilityChanged(false);
 
         // Update the visibility of notification shade and status bar window.

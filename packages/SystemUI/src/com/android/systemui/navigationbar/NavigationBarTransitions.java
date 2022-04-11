@@ -29,12 +29,21 @@ import android.view.IWallpaperVisibilityListener;
 import android.view.IWindowManager;
 import android.view.View;
 
+import android.content.Context;
+import android.os.Handler;
+import android.provider.Settings;
+import android.os.UserHandle;
+import android.database.ContentObserver;
+import android.net.Uri;
+
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
 import com.android.systemui.navigationbar.buttons.ButtonDispatcher;
 import com.android.systemui.statusbar.CommandQueue;
+import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 import com.android.systemui.statusbar.phone.BarTransitions;
 import com.android.systemui.statusbar.phone.LightBarTransitionsController;
+import com.android.settingslib.Utils;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -52,6 +61,7 @@ public final class NavigationBarTransitions extends BarTransitions implements
     public interface DarkIntensityListener {
         /**
          * Called when the color of nav bar elements changes.
+         *
          * @param darkIntensity 0 is the lightest color, 1 is the darkest.
          */
         void onDarkIntensity(float darkIntensity);
@@ -71,16 +81,100 @@ public final class NavigationBarTransitions extends BarTransitions implements
     private final Handler mHandler = Handler.getMain();
     private final IWallpaperVisibilityListener mWallpaperVisibilityListener =
             new IWallpaperVisibilityListener.Stub() {
-        @Override
-        public void onWallpaperVisibilityChanged(boolean newVisibility,
-        int displayId) throws RemoteException {
-            mWallpaperVisible = newVisibility;
-            mHandler.post(() -> applyLightsOut(true, false));
+                @Override
+                public void onWallpaperVisibilityChanged(boolean newVisibility,
+                                                         int displayId) throws RemoteException {
+                    mWallpaperVisible = newVisibility;
+                    mHandler.post(() -> applyLightsOut(true, false));
+                }
+            };
+
+    private static final class GradientObserver extends ContentObserver {
+        private static final Uri DYNAMIC_SYSTEM_BARS_GRADIENT_URI = Settings.System.getUriFor(
+                "DYNAMIC_NAVIGATION_BARS_GRADIENT_STATE");
+
+        private final NavigationBarBackgroundDrawable mDrawable;
+
+        private GradientObserver(NavigationBarBackgroundDrawable drawable,
+                                 Handler handler) {
+            super(handler);
+            mDrawable = drawable;
         }
-    };
+
+        @Override
+        public void onChange(boolean selfChange) {
+            mDrawable.setOverrideGradientAlpha(Settings.System.getInt(
+                    mDrawable.mContext.getContentResolver(),
+                    "DYNAMIC_NAVIGATION_BARS_GRADIENT_STATE", 0) == 1 ? 0xff : 0);
+        }
+    }
+
+    protected static class NavigationBarBackgroundDrawable
+            extends BarTransitions.BarBackgroundDrawable {
+        private final Context mContext;
+
+        private int mOverrideColor = 0;
+        private int mOverrideGradientAlpha = 0;
+
+        public NavigationBarBackgroundDrawable(Context context) {
+            super(context, R.drawable.nav_background, R.color.system_bar_background_transparent,
+                    com.android.internal.R.color.system_bar_background_semi_transparent,
+                    R.color.system_bar_background_transparent,
+                    Utils.getColorAttrDefaultColor(context, android.R.attr.colorError));
+
+            mContext = context;
+
+            final GradientObserver obs = new GradientObserver(this, new Handler());
+            (context.getContentResolver()).registerContentObserver(
+                    GradientObserver.DYNAMIC_SYSTEM_BARS_GRADIENT_URI,
+                    false, obs, UserHandle.USER_ALL);
+
+            mOverrideGradientAlpha = Settings.System.getInt(mContext.getContentResolver(),
+                    "DYNAMIC_NAVIGATION_BARS_GRADIENT_STATE", 0) == 1 ?
+                    0xff : 0;
+
+            BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+                @Override
+                public void onUpdateNavigationBarColor(final int previousColor, final int color) {
+                    mOverrideColor = color;
+                    generateAnimator();
+                }
+
+            });
+            BarBackgroundUpdater.init(context);
+        }
+
+
+        @Override
+        protected int getColorOpaque() {
+            return mOverrideColor == 0 ? super.getColorOpaque() : mOverrideColor;
+        }
+
+        @Override
+        protected int getColorSemiTransparent() {
+            return mOverrideColor == 0 ? super.getColorSemiTransparent() :
+                    (mOverrideColor & 0x00ffffff | 0x7f000000);
+        }
+
+        @Override
+        protected int getGradientAlphaOpaque() {
+            return mOverrideGradientAlpha;
+        }
+
+        @Override
+        protected int getGradientAlphaSemiTransparent() {
+            return mOverrideGradientAlpha & 0x7f;
+        }
+
+        public void setOverrideGradientAlpha(final int alpha) {
+            mOverrideGradientAlpha = alpha;
+            generateAnimator();
+        }
+    }
 
     public NavigationBarTransitions(NavigationBarView view, CommandQueue commandQueue) {
-        super(view, R.drawable.nav_background);
+        super(view, new NavigationBarBackgroundDrawable(view.getContext()));
         mView = view;
         mLightTransitionsController = new LightBarTransitionsController(
                 view.getContext(), this, commandQueue);
@@ -180,9 +274,9 @@ public final class NavigationBarTransitions extends BarTransitions implements
         } else {
             final int duration = lightsOut ? LIGHTS_OUT_DURATION : LIGHTS_IN_DURATION;
             mNavButtons.animate()
-                .alpha(navButtonsAlpha)
-                .setDuration(duration)
-                .start();
+                    .alpha(navButtonsAlpha)
+                    .setDuration(duration)
+                    .start();
         }
     }
 
@@ -220,7 +314,7 @@ public final class NavigationBarTransitions extends BarTransitions implements
 
     /**
      * Register {@code listener} to be notified when the color of nav bar elements changes.
-     *
+     * <p>
      * Returns the current nav bar color.
      */
     public float addDarkIntensityListener(DarkIntensityListener listener) {

@@ -337,8 +337,8 @@ public class MediaControlPanel {
         } else {
             mController = null;
         }
-
-    	ConstraintSet expandedSet = mMediaViewController.getExpandedLayout();
+        
+        ConstraintSet expandedSet = mMediaViewController.getExpandedLayout();
         ConstraintSet collapsedSet = mMediaViewController.getCollapsedLayout();
 
         // Click action
