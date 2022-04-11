@@ -43,6 +43,8 @@ import static com.android.systemui.statusbar.phone.BarTransitions.MODE_SEMI_TRAN
 import static com.android.systemui.statusbar.phone.BarTransitions.MODE_TRANSPARENT;
 import static com.android.systemui.statusbar.phone.BarTransitions.TransitionMode;
 
+import com.znxt.systemui.ResourceUtils;
+
 import android.annotation.Nullable;
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
@@ -286,6 +288,7 @@ import dagger.Lazy;
 public class StatusBar extends SystemUI implements
         ActivityStarter,
         LifecycleOwner {
+	public static boolean mExpandedDsb;
     public static final boolean MULTIUSER_DEBUG = false;
 
     protected static final int MSG_DISMISS_KEYBOARD_SHORTCUTS_MENU = 1027;
@@ -1206,6 +1209,10 @@ public class StatusBar extends SystemUI implements
         updateDisplaySize(); // populates mDisplayMetrics
         updateResources();
         updateTheme();
+        
+        Context ctx = mContext;
+        String name = ctx.getPackageName();
+        ResourceUtils.init(name, ctx);
 
         inflateStatusBarWindow();
         mNotificationShadeWindowViewController.setService(this, mNotificationShadeWindowController);
@@ -2247,6 +2254,8 @@ public class StatusBar extends SystemUI implements
 
         mExpandedVisible = true;
 
+        mExpandedDsb = true;
+
         // Expand the window to encompass the full screen in anticipation of the drag.
         // This is only possible to do atomically because the status bar is at the top of the screen!
         mNotificationShadeWindowController.setPanelVisible(true);
@@ -2315,6 +2324,8 @@ public class StatusBar extends SystemUI implements
         mNotificationPanelViewController.closeQs();
 
         mExpandedVisible = false;
+        mExpandedDsb = false;
+
         visibilityChanged(false);
 
         // Update the visibility of notification shade and status bar window.

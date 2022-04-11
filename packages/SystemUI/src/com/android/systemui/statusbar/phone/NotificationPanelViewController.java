@@ -228,6 +228,8 @@ import javax.inject.Provider;
 @StatusBarComponent.StatusBarScope
 public class NotificationPanelViewController extends PanelViewController {
 
+    public static boolean mKeyguardShowingDsb;
+
     private static final boolean DEBUG = false;
     private static final boolean DEBUG_PULSE_LIGHT = false;
 
@@ -4730,6 +4732,7 @@ public class NotificationPanelViewController extends PanelViewController {
 
             mBarState = statusBarState;
             mKeyguardShowing = keyguardShowing;
+            mKeyguardShowingDsb = keyguardShowing;
 
             if (oldState == KEYGUARD && (goingToFullShade
                     || statusBarState == StatusBarState.SHADE_LOCKED)) {
