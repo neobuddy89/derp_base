@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18.0dp"
+    android:height="18.0dp"
+    android:viewportWidth="59.000000"
+    android:viewportHeight="59.000000">
+
+    <group
+            android:translateY="59.000000"
+            android:scaleX="0.100000"
+            android:scaleY="-0.100000">
+        <path
+            android:fillColor="#000000"
+            android:strokeWidth="1"
+            android:pathData="M213 561 c-70 -24 -113 -59 -146 -119 -57 -106 -43 -223 38 -306 41 -43 65 -57 65 -38 0 4 -16 24 -36 43 -104 100 -105 247 -2 346 45 43 96 63 163 63 219 0 323 -265 161 -408 -36 -31 -46 -52 -26 -52 6 0 31 21 55 46 137 140 72 372 -118 429 -64 19 -90 19 -154 -4z" />
+        <path
+            android:fillColor="#000000"
+            android:strokeWidth="1"
+            android:pathData="M225 529 c-43 -12 -102 -64 -125 -110 -43 -84 -17 -221 53 -273 41 -30 44 -11 4 30 -120 124 -32 344 138 344 170 0 258 -220 138 -344 -40 -41 -37 -60 4 -30 70 52 96 189 53 273 -48 95 -160 141 -265 110z" />
+        <path
+            android:fillColor="#000000"
+            android:strokeWidth="1"
+            android:pathData="M221 482 c-90 -45 -126 -155 -81 -247 20 -42 55 -74 67 -61 3 2 -10 23 -27 45 -85 105 -17 253 115 253 58 0 104 -27 132 -78 38 -66 29 -124 -27 -188 -24 -27 -28 -36 -16 -36 23 0 63 45 77 87 38 116 -48 243 -166 243 -22 0 -55 -8 -74 -18z" />
+        <path
+            android:fillColor="#000000"
+            android:strokeWidth="1"
+            android:pathData="M219 427 c-64 -43 -76 -141 -23 -194 35 -35 40 -23 9 22 -33 49 -33 94 0 134 52 61 133 60 183 -4 35 -44 27 -99 -21 -152 -28 -31 -3 -30 28 1 32 32 41 87 23 134 -29 76 -129 106 -199 59z" />
+        <path
+            android:fillColor="#000000"
+            android:strokeWidth="1"
+            android:pathData="M251 364 c-25 -32 -26 -42 -4 -74 13 -18 18 -54 22 -149 6 -117 7 -126 26 -126 19 0 20 9 26 125 4 98 9 132 25 157 19 32 19 32 -2 60 -29 39 -66 41 -93 7z" />
+    </group>
+</vector>

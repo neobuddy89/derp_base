@@ -1,0 +1,51 @@
+<!--
+Copyright (C) 2015 The Android Open Source Project
+Copyright (C) 2022 Nusantara Android Development
+   Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+         http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+        android:insetLeft="0.5dp"
+        android:insetRight="0.5dp">
+    <vector android:width="18dp"
+            android:height="18dp"
+            android:viewportWidth="59.0"
+            android:viewportHeight="59.0">
+        <group
+                android:translateY="59.000000"
+                android:scaleX="0.100000"
+                android:scaleY="-0.100000">
+            <path
+                android:fillColor="#000000"
+                android:strokeWidth="1"
+                android:pathData="M268 562 c-7 -10 -25 -22 -41 -26 -15 -3 -41 -19 -58 -34 l-32 -28 75 -61 74 -61 74 68 c82 74 83 84 17 111 -18 7 -40 21 -50 31 -23 23 -42 23 -59 0z" />
+            <path
+                android:fillColor="#000000"
+                android:strokeWidth="1"
+                android:pathData="M117 455 c39 -44 85 -93 102 -109 17 -17 31 -34 31 -39 0 -5 -37 -57 -82 -115 -86 -112 -84 -112 46 5 69 62 82 71 95 59 9 -7 63 -50 121 -96 l105 -84 -62 69 c-34 39 -80 88 -102 110 -23 21 -41 43 -41 48 0 5 32 50 72 100 111 144 111 144 -40 3 -66 -60 -76 -66 -90 -53 -10 7 -64 51 -122 97 l-105 84 72 -79z" />
+            <path
+                android:fillColor="#000000"
+                android:strokeWidth="1"
+                android:pathData="M396 379 l-56 -73 27 -30 c64 -71 148 -156 155 -156 14 0 8 20 -14 51 -19 26 -23 47 -28 144 -3 63 -10 119 -16 125 -8 8 -27 -8 -68 -61z" />
+            <path
+                android:fillColor="#000000"
+                android:strokeWidth="1"
+                android:pathData="M116 410 c-3 -14 -7 -66 -8 -117 -3 -77 -7 -96 -26 -123 -23 -30 -24 -60 -2 -60 8 0 132 149 152 184 4 8 -16 38 -51 77 -56 61 -59 63 -65 39z" />
+            <path
+                android:fillColor="#000000"
+                android:strokeWidth="1"
+                android:pathData="M206 176 l-80 -73 40 -6 c50 -9 215 -8 274 1 l44 7 -91 73 c-50 39 -95 72 -99 72 -5 0 -45 -33 -88 -74z" />
+            <path
+                android:fillColor="#000000"
+                android:strokeWidth="1"
+                android:pathData="M240 55 c0 -49 92 -59 109 -12 13 32 6 37 -55 37 -51 0 -54 -1 -54 -25z" />
+        </group>
+    </vector>
+</inset>
