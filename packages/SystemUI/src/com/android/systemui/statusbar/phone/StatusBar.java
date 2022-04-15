@@ -581,7 +581,6 @@ public class StatusBar extends SystemUI implements
     private View mReportRejectedTouch;
 
     private boolean mExpandedVisible;
-	public static boolean mExpandedDsb;
 
     private final int[] mAbsPos = new int[2];
 
@@ -2349,8 +2348,6 @@ public class StatusBar extends SystemUI implements
 
         mExpandedVisible = true;
 
-        mExpandedDsb = true;
-
         // Expand the window to encompass the full screen in anticipation of the drag.
         // This is only possible to do atomically because the status bar is at the top of the screen!
         mNotificationShadeWindowController.setPanelVisible(true);
@@ -2419,7 +2416,6 @@ public class StatusBar extends SystemUI implements
         mNotificationPanelViewController.closeQs();
 
         mExpandedVisible = false;
-        mExpandedDsb = false;
 
         visibilityChanged(false);
 

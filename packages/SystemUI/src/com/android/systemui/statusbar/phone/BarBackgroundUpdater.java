@@ -45,51 +45,26 @@ public class BarBackgroundUpdater {
     public static boolean abu;
     public static boolean accent;
     public static boolean linkedColor;
-    public static boolean mHeaderEnabled;
     public static boolean mStatusGradientEnabled;
     public static boolean mNavigationGradientEnabled;
     public static boolean mStatusFilterEnabled;
     public static boolean mNavigationEnabled;
-    public static boolean mNotifEnabled;
     public static boolean mStatusEnabled;
     public static boolean reverse;
     public static boolean PAUSED;
-    public static int mHeaderIconOverrideColor;
-    public static int mHeaderOverrideColor;
+
     public static int mNavigationBarIconOverrideColor;
     public static int mNavigationBarOverrideColor;
-    public static int mNotifIconOverrideColor;
-    public static int mNotifOverrideColor;
-    public static int mNotipIconOverrideColor;
-    public static int mNotipOverrideColor;
-    public static int mPreviousHeaderIconOverrideColor;
-    public static int mPreviousHeaderOverrideColor;
     public static int mPreviousNavigationBarIconOverrideColor;
     public static int mPreviousNavigationBarOverrideColor;
-    public static int mPreviousNotifIconOverrideColor;
-    public static int mPreviousNotifOverrideColor;
-    public static int mPreviousNotipIconOverrideColor;
-    public static int mPreviousNotipOverrideColor;
     public static int mPreviousStatusBarIconOverrideColor;
     public static int mPreviousStatusBarOverrideColor;
-    public static int mPreviousTileIconOverrideColor;
-    public static int mPreviousTileOverrideColor;
     public static int mStatusBarIconOverrideColor;
     public static int mStatusBarOverrideColor;
-    public static int mTileIconOverrideColor;
-    public static int mTileOverrideColor;
-    public static int headerOverrideColor;
-    public static int headerIconOverrideColor;
     public static int navigationBarOverrideColor;
     public static int navigationBarIconOverrideColor;
-    public static int notifOverrideColor;
-    public static int notifIconOverrideColor;
-    public static int notipOverrideColor;
-    public static int notipIconOverrideColor;
     public static int statusBarOverrideColor;
     public static int statusBarIconOverrideColor;
-    public static int tileOverrideColor;
-    public static int tileIconOverrideColor;
     public static int mTransparency;
     public static int parseColorLight;
     public static int parseColorDark;
@@ -135,7 +110,7 @@ public class BarBackgroundUpdater {
                     continue;
                 }
 
-                boolean isAnyDsbEnabled = mStatusEnabled || mNavigationEnabled || mHeaderEnabled || mNotifEnabled;
+                boolean isAnyDsbEnabled = mStatusEnabled || mNavigationEnabled;
 
                 if (isAnyDsbEnabled) {
                     final Context context = mContext;
@@ -189,25 +164,14 @@ public class BarBackgroundUpdater {
 
                     boolean statuscolors = (colors != 0);
 
-                    int dsbColor = mDynamicColor = statusBarOverrideColor = tileOverrideColor = headerOverrideColor = mStatusFilterEnabled ? filter(colors, (float) f3) : colors;
-                    int iconColor = statusBarIconOverrideColor = tileIconOverrideColor = headerIconOverrideColor = (cekbriknes(dsbColor) <= f || !statuscolors) ? parseColorLight : parseColorDark;
+                    int dsbColor = mDynamicColor = statusBarOverrideColor = mStatusFilterEnabled ? filter(colors, (float) f3) : colors;
+                    int iconColor = statusBarIconOverrideColor = (cekbriknes(dsbColor) <= f || !statuscolors) ? parseColorLight : parseColorDark;
 
                     // Dynamic status bar
                     boolean statusEnable = mStatusEnabled;
 
                     updateStatusBarColor(statusEnable ? dsbColor : 0);
                     updateStatusBarIconColor(statusEnable ? iconColor : 0);
-
-                    // Dynamic Qs Header & Tile
-                    boolean headerEnable = mHeaderEnabled;
-
-                    int headerColor = headerEnable ? dsbColor : 0;
-                    int headerIconColor = headerEnable ? iconColor : 0;
-
-                    updateTileColor(headerColor);
-                    updateTileIconColor(headerIconColor);
-                    updateHeaderColor(headerColor);
-                    updateHeaderIconColor(headerIconColor);
 
                     // Dynamic navigation bar
                     if (mNavigationEnabled) {
@@ -234,10 +198,6 @@ public class BarBackgroundUpdater {
                     updateStatusBarIconColor(0);
                     updateNavigationBarColor(0);
                     updateNavigationBarIconColor(0);
-                    updateHeaderColor(0);
-                    updateHeaderIconColor(0);
-                    updateTileColor(0);
-                    updateTileIconColor(0);
                 }
 
                 // do a quick cleanup of the listener list
@@ -265,96 +225,11 @@ public class BarBackgroundUpdater {
             }
         }
 
-    });
-
-    private static final Thread THREAD2 = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            while (true) {
-                int f3 = -10;
-                float f = 0.7f;
-
-                if (PAUSED) {
-                    // we have been told to do nothing; wait for notify to continue
-                    synchronized (BarBackgroundUpdater.class) {
-                        try {
-                            BarBackgroundUpdater.class.wait();
-                        } catch (InterruptedException e) {
-                            return;
-                        }
-                    }
-                    continue;
-                }
-
-                if (mNotifEnabled) {
-                    final Context context = mContext;
-
-                    if (context == null) {
-                        // we haven't been initiated yet; retry in a bit
-
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            return;
-                        }
-                        continue;
-                    }
-
-                    final int colors = mDynamicColor;
-
-                    boolean dsbcolors = (colors != 0);
-                    int dsbColor = mStatusFilterEnabled ? filter(colors, (float) f3) : colors;
-                    int notifcolor = notifOverrideColor = notipOverrideColor = dsbColor;
-                    int iconColor = notifIconOverrideColor = notipIconOverrideColor = (cekbriknes(notifcolor) <= f || !dsbcolors) ? parseColorLight : parseColorDark;
-
-                    boolean notifEnable = mNotifEnabled;
-                    int dsbNotifColor = notifEnable ? notifcolor : 0;
-                    int dsbIconNotifColor = notifEnable ? iconColor : 0;
-
-                    updateNotificationColor(dsbNotifColor);
-                    updateNotipColor(dsbNotifColor);
-                    updateNotificationIconColor(dsbIconNotifColor);
-                    updateNotipIconColor(dsbIconNotifColor);
-
-                } else {
-                    // we are disabled completely - shush
-                    updateNotificationColor(0);
-                    updateNotificationIconColor(0);
-                    updateNotipColor(0);
-                    updateNotipIconColor(0);
-                }
-
-                // do a quick cleanup of the listener list
-                synchronized (BarBackgroundUpdater.class) {
-                    final ArrayList<UpdateListener> removables = new ArrayList<UpdateListener>();
-
-                    for (final UpdateListener listener : mListeners) {
-                        if (listener.shouldGc()) {
-                            removables.add(listener);
-                        }
-                    }
-
-                    for (final UpdateListener removable : removables) {
-                        mListeners.remove(removable);
-                    }
-                }
-                final long now = System.currentTimeMillis();
-                final long delta = now - now;
-                final long delay = Math.max(sMinDelay, delta * 2);
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException e) {
-                    return;
-                }
-            }
-        }
     });
 
     static {
         THREAD.setPriority(4);
-        THREAD2.setPriority(4);
         THREAD.start();
-        THREAD2.start();
     }
 
     public static float cekbriknes(int i) {
@@ -397,10 +272,8 @@ public class BarBackgroundUpdater {
             mObserver = new SettingsObserver(new Handler());
         }
         resolver.registerContentObserver(Settings.System.getUriFor("DYNAMIC_STATUS_BAR_STATE"), false, mObserver);
-        resolver.registerContentObserver(Settings.System.getUriFor("DYNAMIC_HEADER_STATE"), false, mObserver);
         resolver.registerContentObserver(Settings.System.getUriFor("DYNAMIC_SYSTEM_BARS_GRADIENT_STATE"), false, mObserver);
         resolver.registerContentObserver(Settings.System.getUriFor("DYNAMIC_NAVIGATION_BARS_GRADIENT_STATE"), false, mObserver);
-        resolver.registerContentObserver(Settings.System.getUriFor("DYNAMIC_NOTIF_STATE"), false, mObserver);
         resolver.registerContentObserver(Settings.System.getUriFor("DYNAMIC_NAVIGATION_BAR_STATE"), false, mObserver);
         resolver.registerContentObserver(Settings.System.getUriFor("DYNAMIC_STATUS_BAR_FILTER_STATE"), false, mObserver);
         resolver.registerContentObserver(Settings.System.getUriFor("EXPERIMENTAL_DSB_FREQUENCY"), false, mObserver);
@@ -413,8 +286,6 @@ public class BarBackgroundUpdater {
         abu = Settings.System.getIntForUser(resolver, "ABU_ABU", 0, -2) == 1;
         reverse = Settings.System.getIntForUser(resolver, "UI_COLOR", 0, -2) == 1;
         mStatusEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_STATUS_BAR_STATE", 0, -2) == 1;
-        mNotifEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_NOTIF_STATE", 0, -2) == 1;
-        mHeaderEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_HEADER_STATE", 0, -2) == 1;
         mStatusGradientEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_SYSTEM_BARS_GRADIENT_STATE", 0, -2) == 1;
         mNavigationGradientEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_NAVIGATION_BARS_GRADIENT_STATE", 0, -2) == 1;
         mNavigationEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_NAVIGATION_BAR_STATE", 0, -2) == 1;
@@ -427,14 +298,6 @@ public class BarBackgroundUpdater {
         for (UpdateListener updateListener : updateListenerArr) {
             if (updateListener != null) {
                 updateListener.onUpdateStatusBarColor(mPreviousStatusBarOverrideColor, mStatusBarOverrideColor);
-                updateListener.onUpdateHeaderColor(mPreviousHeaderOverrideColor, mHeaderOverrideColor);
-                updateListener.onUpdateHeaderIconColor(mPreviousHeaderIconOverrideColor, mHeaderIconOverrideColor);
-                updateListener.onUpdateTileColor(mPreviousTileOverrideColor, mTileOverrideColor);
-                updateListener.onUpdateTileIconColor(mPreviousTileIconOverrideColor, mTileIconOverrideColor);
-                updateListener.onUpdateNotificationColor(mPreviousNotifOverrideColor, mNotifOverrideColor);
-                updateListener.onUpdateNotificationIconColor(mPreviousNotifIconOverrideColor, mNotifIconOverrideColor);
-                updateListener.onUpdateNotipColor(mPreviousNotipOverrideColor, mNotipOverrideColor);
-                updateListener.onUpdateNotipIconColor(mPreviousNotipIconOverrideColor, mNotipIconOverrideColor);
                 updateListener.onUpdateStatusBarIconColor(mPreviousStatusBarIconOverrideColor, mStatusBarIconOverrideColor);
                 updateListener.onUpdateNavigationBarColor(mPreviousNavigationBarOverrideColor, mNavigationBarOverrideColor);
                 updateListener.onUpdateNavigationBarIconColor(mPreviousNavigationBarIconOverrideColor, mNavigationBarIconOverrideColor);
@@ -476,8 +339,6 @@ public class BarBackgroundUpdater {
             abu = Settings.System.getIntForUser(resolver, "ABU_ABU", 0, -2) == 1;
             reverse = Settings.System.getIntForUser(resolver, "UI_COLOR", 0, -2) == 1;
             mStatusEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_STATUS_BAR_STATE", 0, -2) == 1;
-            mNotifEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_NOTIF_STATE", 0, -2) == 1;
-            mHeaderEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_HEADER_STATE", 0, -2) == 1;
             mStatusGradientEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_SYSTEM_BARS_GRADIENT_STATE", 0, -2) == 1;
             mNavigationGradientEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_NAVIGATION_BARS_GRADIENT_STATE", 0, -2) == 1;
             mNavigationEnabled = Settings.System.getIntForUser(resolver, "DYNAMIC_NAVIGATION_BAR_STATE", 0, -2) == 1;
@@ -489,40 +350,16 @@ public class BarBackgroundUpdater {
     public static class UpdateListener {
         private final WeakReference<Object> mRef;
 
-        public void onUpdateHeaderColor(int previousColor, int newColor) {
-        }
-
-        public void onUpdateHeaderIconColor(int previousColor, int newColor) {
-        }
-
         public void onUpdateNavigationBarColor(int previousColor, int newColor) {
         }
 
         public void onUpdateNavigationBarIconColor(int previousColor, int newColor) {
         }
 
-        public void onUpdateNotificationColor(int previousColor, int newColor) {
-        }
-
-        public void onUpdateNotificationIconColor(int previousColor, int newColor) {
-        }
-
-        public void onUpdateNotipColor(int previousColor, int newColor) {
-        }
-
-        public void onUpdateNotipIconColor(int previousColor, int newColor) {
-        }
-
         public void onUpdateStatusBarColor(int previousColor, int newColor) {
         }
 
         public void onUpdateStatusBarIconColor(int previousColor, int newColor) {
-        }
-
-        public void onUpdateTileColor(int previousColor, int newColor) {
-        }
-
-        public void onUpdateTileIconColor(int previousColor, int newColor) {
         }
 
         public UpdateListener(Object obj) {
@@ -534,60 +371,12 @@ public class BarBackgroundUpdater {
         }
     }
 
-    public synchronized static void updateNotificationColor(int newColor) {
-        if (mNotifOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mNotifEnabled) {
-                mPreviousNotifOverrideColor = mNotifOverrideColor;
-                mNotifOverrideColor = newColor;
-                for (UpdateListener onUpdateNotificationColor : mListeners) {
-                    onUpdateNotificationColor.onUpdateNotificationColor(mPreviousNotifOverrideColor, mNotifOverrideColor);
-                }
-            }
-        }
-    }
-
-    public synchronized static void updateNotipColor(int newColor) {
-        if (mNotipOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mNotifEnabled) {
-                mPreviousNotipOverrideColor = mNotipOverrideColor;
-                mNotipOverrideColor = newColor;
-                for (UpdateListener onUpdateNotipColor : mListeners) {
-                    onUpdateNotipColor.onUpdateNotipColor(mPreviousNotipOverrideColor, mNotipOverrideColor);
-                }
-            }
-        }
-    }
-
     public synchronized static void updateStatusBarColor(int newColor) {
         if (mStatusBarOverrideColor != newColor) {
             mPreviousStatusBarOverrideColor = mStatusBarOverrideColor;
             mStatusBarOverrideColor = newColor;
             for (UpdateListener onUpdateStatusBarColor : mListeners) {
                 onUpdateStatusBarColor.onUpdateStatusBarColor(mPreviousStatusBarOverrideColor, mStatusBarOverrideColor);
-            }
-        }
-    }
-
-    public synchronized static void updateTileColor(int newColor) {
-        if (mTileOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mHeaderEnabled) {
-                mPreviousTileOverrideColor = mTileOverrideColor;
-                mTileOverrideColor = newColor;
-                for (UpdateListener onUpdateTileColor : mListeners) {
-                    onUpdateTileColor.onUpdateTileColor(mPreviousTileOverrideColor, mTileOverrideColor);
-                }
-            }
-        }
-    }
-
-    public synchronized static void updateHeaderColor(int newColor) {
-        if (mHeaderOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mHeaderEnabled) {
-                mPreviousHeaderOverrideColor = mHeaderOverrideColor;
-                mHeaderOverrideColor = newColor;
-                for (UpdateListener onUpdateHeaderColor : mListeners) {
-                    onUpdateHeaderColor.onUpdateHeaderColor(mPreviousHeaderOverrideColor, mHeaderOverrideColor);
-                }
             }
         }
     }
@@ -602,42 +391,6 @@ public class BarBackgroundUpdater {
         }
     }
 
-    public synchronized static void updateHeaderIconColor(int newColor) {
-        if (mHeaderIconOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mHeaderEnabled) {
-                mPreviousHeaderIconOverrideColor = mHeaderIconOverrideColor;
-                mHeaderIconOverrideColor = newColor;
-                for (UpdateListener onUpdateHeaderIconColor : mListeners) {
-                    onUpdateHeaderIconColor.onUpdateHeaderIconColor(mPreviousHeaderIconOverrideColor, mHeaderIconOverrideColor);
-                }
-            }
-        }
-    }
-
-    public synchronized static void updateNotificationIconColor(int newColor) {
-        if (mNotifIconOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mNotifEnabled) {
-                mPreviousNotifIconOverrideColor = mNotifIconOverrideColor;
-                mNotifIconOverrideColor = newColor;
-                for (UpdateListener onUpdateNotificationIconColor : mListeners) {
-                    onUpdateNotificationIconColor.onUpdateNotificationIconColor(mPreviousNotifIconOverrideColor, mNotifIconOverrideColor);
-                }
-            }
-        }
-    }
-
-    public synchronized static void updateNotipIconColor(int newColor) {
-        if (mNotipIconOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mNotifEnabled) {
-                mPreviousNotipIconOverrideColor = mNotipIconOverrideColor;
-                mNotipIconOverrideColor = newColor;
-                for (UpdateListener onUpdateNotipIconColor : mListeners) {
-                    onUpdateNotipIconColor.onUpdateNotipIconColor(mPreviousNotipIconOverrideColor, mNotipIconOverrideColor);
-                }
-            }
-        }
-    }
-
     public synchronized static void updateStatusBarIconColor(int newColor) {
         if (mStatusBarIconOverrideColor != newColor) {
             mPreviousStatusBarIconOverrideColor = mStatusBarIconOverrideColor;
@@ -648,26 +401,12 @@ public class BarBackgroundUpdater {
         }
     }
 
-    public synchronized static void updateTileIconColor(int newColor) {
-        if (mTileIconOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mHeaderEnabled) {
-                mPreviousTileIconOverrideColor = mTileIconOverrideColor;
-                mTileIconOverrideColor = newColor;
-                for (UpdateListener onUpdateTileIconColor : mListeners) {
-                    onUpdateTileIconColor.onUpdateTileIconColor(mPreviousTileIconOverrideColor, mTileIconOverrideColor);
-                }
-            }
-        }
-    }
-
     public synchronized static void updateNavigationBarIconColor(int newColor) {
         if (mNavigationBarIconOverrideColor != newColor) {
-            if (!StatusBar.mExpandedDsb || !mNavigationEnabled) {
-                mPreviousNavigationBarIconOverrideColor = mNavigationBarIconOverrideColor;
-                mNavigationBarIconOverrideColor = newColor;
-                for (UpdateListener onUpdateNavigationBarIconColor : mListeners) {
-                    onUpdateNavigationBarIconColor.onUpdateNavigationBarIconColor(mPreviousNavigationBarIconOverrideColor, mNavigationBarIconOverrideColor);
-                }
+            mPreviousNavigationBarIconOverrideColor = mNavigationBarIconOverrideColor;
+            mNavigationBarIconOverrideColor = newColor;
+            for (UpdateListener onUpdateNavigationBarIconColor : mListeners) {
+                onUpdateNavigationBarIconColor.onUpdateNavigationBarIconColor(mPreviousNavigationBarIconOverrideColor, mNavigationBarIconOverrideColor);
             }
         }
     }
