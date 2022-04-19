@@ -6552,6 +6552,34 @@ public final class Settings {
         public static final String QS_FOOTER_DATA_USAGE = "qs_footer_data_usage";
 
         /**
+         * Enable and disable combined blur Expanded Notifications Panel
+         *
+         * @hide
+         */
+        public static final String COMBINED_BLUR =
+                 "combined_blur";
+
+        /**
+         * the blur scale values
+         * @hide
+         */
+        public static final String BLUR_SCALE_PREFERENCE_KEY = "blur_scale";
+
+        /**
+         * the blur radius values
+         *
+         * @hide
+         */
+        public static final String BLUR_RADIUS_PREFERENCE_KEY =
+                 "blur_radius";
+
+        /**
+         * Enable and disable The Nusantara Blur Style
+         * @hide
+         */
+        public static final String BLUR_STYLE_PREFERENCE_KEY = "blur_style";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate

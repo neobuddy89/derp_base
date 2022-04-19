@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2022 The Nusantara Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape
+            android:shape="rectangle">
+            <solid
+                android:color="@android:color/transparent" />
+            <corners
+                android:radius="?android:dialogCornerRadius" />
+        </shape>
+    </item>
+    <item>
+        <shape
+            android:shape="rectangle">
+            <solid
+                android:color="@color/settingslib_colorSurfaceHeader" />
+        </shape>
+    </item>
+    <item
+        android:gravity="start|bottom|center"
+        android:height="48.0dip"
+        android:width="96.0dip"
+        android:bottom="-48.0dip">
+        <vector
+            android:height="8.0dip"
+            android:width="8.0dip"
+            android:viewportWidth="8.0"
+            android:viewportHeight="8.0"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+            <group
+                android:name="rotationGroup"
+                android:pivotX="4.0"
+                android:pivotY="4.0"
+                android:rotation="0.0">
+                <path
+                    android:fillColor="@color/settingslib_colorSurfaceHeader"
+                    android:pathData="M8,0H0v8C0,3.6,3.6,0,8,0z" />
+            </group>
+        </vector>
+    </item>
+    <item
+        android:gravity="end|bottom|center"
+        android:height="48.0dip"
+        android:width="96.0dip"
+        android:bottom="-48.0dip">
+        <vector
+            android:height="8.0dip"
+            android:width="8.0dip"
+            android:viewportWidth="8.0"
+            android:viewportHeight="8.0"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+            <group
+                android:name="rotationGroup"
+                android:pivotX="4.0"
+                android:pivotY="4.0"
+                android:rotation="90.0">
+                <path
+                    android:fillColor="@color/settingslib_colorSurfaceHeader"
+                    android:pathData="M8,0H0v8C0,3.6,3.6,0,8,0z" />
+            </group>
+        </vector>
+    </item>
+    <item
+        android:gravity="start|bottom|center"
+        android:height="28.0dip"
+        android:width="28.0dip"
+        android:bottom="-48.0dip">
+        <vector
+            android:height="8.0dip"
+            android:width="8.0dip"
+            android:viewportWidth="8.0"
+            android:viewportHeight="8.0"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+            <group
+                android:name="rotationGroup"
+                android:pivotX="4.0"
+                android:pivotY="4.0"
+                android:rotation="0.0">
+                <path
+                    android:fillColor="@color/settingslib_colorSurfaceHeader"
+                    android:pathData="M8,0H0v8C0,3.6,3.6,0,8,0z" />
+            </group>
+        </vector>
+    </item>
+    <item
+        android:gravity="end|bottom|center"
+        android:height="28.0dip"
+        android:width="28.0dip"
+        android:bottom="-48.0dip">
+        <vector
+            android:height="8.0dip"
+            android:width="8.0dip"
+            android:viewportWidth="8.0"
+            android:viewportHeight="8.0"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+            <group
+                android:name="rotationGroup"
+                android:pivotX="4.0"
+                android:pivotY="4.0"
+                android:rotation="90.0">
+                <path
+                    android:fillColor="@color/settingslib_colorSurfaceHeader"
+                    android:pathData="M8,0H0v8C0,3.6,3.6,0,8,0z" />
+            </group>
+        </vector>
+    </item>
+</layer-list>

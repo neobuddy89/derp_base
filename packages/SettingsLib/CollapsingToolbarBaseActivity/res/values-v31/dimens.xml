@@ -20,4 +20,7 @@
     <dimen name="settingslib_scrim_visible_height_trigger">137dp</dimen>
     <dimen name="expanded_title_margin_start">24dp</dimen>
     <dimen name="expanded_title_margin_end">24dp</dimen>
+
+    <!-- Top Level Background Radius-->
+    <dimen name="nad_top_bg_radius">28dp</dimen>
 </resources>

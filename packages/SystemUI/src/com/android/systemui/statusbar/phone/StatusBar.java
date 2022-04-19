@@ -2352,6 +2352,9 @@ public class StatusBar extends SystemUI implements
         // This is only possible to do atomically because the status bar is at the top of the screen!
         mNotificationShadeWindowController.setPanelVisible(true);
 
+        // start the blur configuration
+        mNotificationPanelViewController.startBlurTask();
+
         visibilityChanged(true);
         mCommandQueue.recomputeDisableFlags(mDisplayId, !force /* animate */);
         setInteracting(StatusBarManager.WINDOW_STATUS_BAR, true);
@@ -2414,6 +2417,9 @@ public class StatusBar extends SystemUI implements
                 1.0f /* speedUpFactor */);
 
         mNotificationPanelViewController.closeQs();
+
+        // Recycle blur expanded is invisible
+        mNotificationPanelViewController.recycle();
 
         mExpandedVisible = false;
 

@@ -103,6 +103,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import com.android.systemui.nad.BlurUtils;
+import com.android.systemui.nad.DisplayUtils;
+
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintSet;
 
@@ -228,6 +238,20 @@ import javax.inject.Provider;
 public class NotificationPanelViewController extends PanelViewController {
 
     public static boolean mKeyguardShowingDsb;
+
+    public static Context mContext;
+    public static boolean mBlurredStatusBarExpandedEnabled;
+    public static int mBlurScale;
+    public static int mBlurRadius;
+    public static boolean mCombinedBlur;
+    public static BlurUtils mBlurUtils;
+    public static FrameLayout mBlurredView;
+    public static ColorFilter mColorFilter;
+    public static AlphaAnimation mAlphaAnimation;
+    public static FrameLayout mInnerBlurredView;
+    public static int mBlurDarkColorFilter;
+    public static int mBlurMixedColorFilter;
+    public static int mBlurLightColorFilter;
 
     private static final boolean DEBUG = false;
     private static final boolean DEBUG_PULSE_LIGHT = false;
@@ -906,6 +930,7 @@ public class NotificationPanelViewController extends PanelViewController {
 
     private void onFinishInflate() {
         loadDimens();
+        initBlurPrefs();
         mKeyguardStatusBar = mView.findViewById(R.id.keyguard_header);
 
         FrameLayout userAvatarContainer = null;
@@ -1025,6 +1050,171 @@ public class NotificationPanelViewController extends PanelViewController {
         mUdfpsMaxYBurnInOffset = mResources.getDimensionPixelSize(R.dimen.udfps_burn_in_offset_y);
         mStatusBarHeaderHeight = mResources.getDimensionPixelSize(
                 R.dimen.status_bar_height);
+    }
+
+    private static final Animation.AnimationListener mAnimationListener = new Animation.AnimationListener() {
+        public void onAnimationStart(Animation anim) {
+            BitmapDrawable bitmap = new BitmapDrawable(
+                DisplayUtils.TakeScreenshotSurface(mContext));
+            if (!mCombinedBlur) {
+                mBlurredView.setBackground(bitmap);
+            }
+            mBlurredView.setVisibility(View.VISIBLE);
+        }
+        public void onAnimationEnd(Animation anim) {}
+        public void onAnimationRepeat(Animation anim) {}
+    };
+
+    public void initBlurPrefs() {
+        AlphaAnimation alpha = mAlphaAnimation = new AlphaAnimation(0.0f, 1.0f);
+        alpha.setDuration(800);
+        alpha.setAnimationListener(mAnimationListener);
+        Context ctx = mContext = mView.getContext();
+        mBlurUtils = new BlurUtils(ctx);
+        FrameLayout blurredView = mBlurredView = new FrameLayout(ctx);
+        FrameLayout innerBlurredView = mInnerBlurredView = new FrameLayout(ctx);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT);
+        blurredView.addView(innerBlurredView, lp);
+        FrameLayout frameLayout = this.mView;
+        frameLayout.addView(blurredView, 0, lp);
+        frameLayout.requestLayout();
+        blurredView.setTag("ready_to_blur");
+        blurredView.setVisibility(View.INVISIBLE);
+    }
+
+    public void recycle() {
+        FrameLayout innerBlurredView = mInnerBlurredView;
+        Drawable bg = innerBlurredView.getBackground();
+        if (bg != null) {
+            if (bg instanceof BitmapDrawable) {
+                Bitmap bitmap = ((BitmapDrawable) bg).getBitmap();
+                if (bitmap != null)
+                    bitmap.recycle();
+            }
+            innerBlurredView.setBackground(null);
+        }
+        FrameLayout blurredView = mBlurredView;
+        blurredView.setBackground(null);
+        blurredView.setTag("ready_to_blur");
+        blurredView.setVisibility(View.INVISIBLE);
+    }
+
+    public int blurOpacity() {
+        mCombinedBlur = Settings.System.getIntForUser(mContext.getContentResolver(), Settings.System.COMBINED_BLUR, 0, -2) == 1;
+        return mCombinedBlur ? Color.parseColor("#38FFFFFF") : Color.WHITE;
+    }
+
+    public void startBlurTask() {
+        ContentResolver resolver = mContext.getContentResolver();
+        mBlurScale = Settings.System.getInt(resolver, Settings.System.BLUR_SCALE_PREFERENCE_KEY, 10);
+        mBlurRadius = Settings.System.getInt(resolver, Settings.System.BLUR_RADIUS_PREFERENCE_KEY, 5);
+        mBlurDarkColorFilter = blurOpacity();
+        mBlurMixedColorFilter = blurOpacity();
+        mBlurLightColorFilter = blurOpacity();
+        boolean enabled = mBlurredStatusBarExpandedEnabled = Settings.System.getIntForUser(resolver, Settings.System.BLUR_STYLE_PREFERENCE_KEY, 0, -2) == 1;
+        if (!enabled || mKeyguardShowing || isPanelVisibleBecauseOfHeadsUp())
+            return;
+        try {
+            if (mBlurredView.getTag().toString().equals("blur_applied"))
+                return;
+        } catch (Exception e){
+        }
+        BlurTask.setBlurTaskCallback(new BlurUtils.BlurTaskCallback() {
+                public void blurTaskDone(Bitmap blurredBitmap) {
+                    FrameLayout blurredView = mBlurredView;
+                    if (blurredBitmap != null) {
+                        ViewGroup.LayoutParams vg = blurredView.getLayoutParams();
+                        int wid = mView.getWidth();
+                        if (vg.width != wid)
+                            vg.width = wid;
+                        blurredView.requestLayout();
+                        FrameLayout innerBlurredView = mInnerBlurredView;
+                        int[] dimens = BlurTask.getRealScreenDimensions();
+                        ViewGroup.LayoutParams lp = innerBlurredView.getLayoutParams();
+                        if (mView.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                            lp.width = dimens[0];
+                        lp.height = dimens[1];
+                        innerBlurredView.requestLayout();
+                        BitmapDrawable drawable = new BitmapDrawable(blurredBitmap);
+                        drawable.setColorFilter(mColorFilter);
+                        innerBlurredView.setBackground(drawable);
+                        blurredView.setTag("blur_applied");
+                    } else {
+                        blurredView.setBackgroundColor(Color.TRANSPARENT);
+                        blurredView.setTag("error");
+                    }
+                    blurredView.startAnimation(mAlphaAnimation);
+                }
+
+                public void dominantColor(int color) {
+                    double lightness = DisplayUtils.getColorLightness(color);
+                    if (lightness >= 0.0 && color <= 1.0) {
+                        if (lightness <= 0.33) {
+                            mColorFilter = new PorterDuffColorFilter(mBlurLightColorFilter, PorterDuff.Mode.MULTIPLY);
+                        } else if (lightness >= 0.34 && lightness <= 0.66) {
+                            mColorFilter = new PorterDuffColorFilter(mBlurMixedColorFilter, PorterDuff.Mode.MULTIPLY);
+                        } else if (lightness >= 0.67 && lightness <= 1.0) {
+                            mColorFilter = new PorterDuffColorFilter(mBlurDarkColorFilter, PorterDuff.Mode.MULTIPLY);
+                        }
+                    } else {
+                        mColorFilter = new PorterDuffColorFilter(mBlurMixedColorFilter, PorterDuff.Mode.MULTIPLY);
+                    }
+                }
+            });
+        BlurTask.setBlurEngine(BlurUtils.BlurEngine.RenderScriptBlur);
+        new BlurTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public static class BlurTask extends AsyncTask<Void, Void, Bitmap> {
+        private static int[] mScreenDimens;
+        private static BlurUtils.BlurEngine mBlurEngine;
+        public static BlurUtils.BlurTaskCallback mCallback;
+        public static Bitmap mScreenBitmap;
+
+        public static void setBlurEngine(BlurUtils.BlurEngine blurEngine) {
+            mBlurEngine = blurEngine;
+        }
+
+        public static void setBlurTaskCallback(BlurUtils.BlurTaskCallback callBack) {
+            mCallback = callBack;
+        }
+
+        public static int[] getRealScreenDimensions() {
+            return mScreenDimens;
+        }
+
+        protected void onPreExecute() {
+            Context context = mContext;
+            mScreenDimens = DisplayUtils.getRealDimensionDisplay(context);
+            mScreenBitmap = DisplayUtils.TakeScreenshotSurface(context);
+        }
+
+        protected Bitmap doInBackground(Void... arg0) {
+            try {
+                Bitmap screenBitmap = mScreenBitmap;
+                if (screenBitmap == null)
+                    return null;
+                mCallback.dominantColor(DisplayUtils.getDominantColorByPixelsSampling(screenBitmap, 20, 20));
+                int[] dim = mScreenDimens;
+                int scale = mBlurScale;
+                //We don't want SystemUI to crash for Arithmetic Exception
+                if(scale == 0) scale = 1;
+                //We don't want SystemUI to crash for Arithmetic Exception
+                int radius = mBlurRadius;
+                if(radius == 0) radius = 1;
+                screenBitmap = mBlurUtils.renderScriptBlur(Bitmap.createScaledBitmap(screenBitmap, dim[0] / scale, dim[1] / scale, false), radius);
+                return screenBitmap;
+            } catch (OutOfMemoryError e) {
+                return null;
+            }
+        }
+
+        protected void onPostExecute(Bitmap bitmap) {
+            if (bitmap != null)
+                mCallback.blurTaskDone(bitmap);
+        }
     }
 
     private void updateViewControllers(KeyguardStatusView keyguardStatusView,

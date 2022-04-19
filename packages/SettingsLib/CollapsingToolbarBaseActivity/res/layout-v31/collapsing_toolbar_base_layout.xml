@@ -22,6 +22,16 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <com.nusantara.support.BlurView
+       android:layout_width="fill_parent"
+       android:layout_height="fill_parent"
+       android:gravity="center"
+       android:orientation="vertical"
+       android:scaleType="centerCrop"
+       android:layout_marginTop="-30dp"
+       android:layout_marginBottom="-30dp"
+       android:elevation="0.0dip" />
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
@@ -39,7 +49,7 @@
             android:clipToPadding="false"
             app:forceApplySystemWindowInsetTop="true"
             app:extraMultilineHeightEnabled="true"
-            app:contentScrim="@color/settingslib_colorSurfaceHeader"
+            app:contentScrim="@drawable/header_round"
             app:maxLines="3"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:scrimAnimationDuration="150"
