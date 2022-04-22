@@ -82,18 +82,29 @@ public class BlurView extends ImageView {
         Bitmap bmp = mBitmapWallpaper = drawableToBitmap(mDrawable);
         Bitmap blur = renderScriptBlur(Bitmap.createScaledBitmap(bmp, dis[0] / scale, dis[1] / scale, false), radius);
 
+        boolean combinedBlur = Settings.System.getInt(mContext.getContentResolver(), "combined_blur", 0) == 1;
+        int combinedColor = setAlphaComponent(mContext.getColor(
+                                com.android.settingslib.collapsingtoolbar.R.color.blur_color),
+                                combinedBlur ? 180 : 120);
+
         if (Settings.System.getInt(mContext.getContentResolver(), "blur_style", 0) == 1) {
-        	mHandler.post(() -> {
-        	    BitmapDrawable background = new BitmapDrawable(getResources(), blur);
-/*           	 if (combinedBlur) {
-           	    background.setColorFilter(getResources().getColor(
-                                                 com.android.internal.R.attr.colorSurfaceHeader));
-           	    background.setAlpha(30)
-         	   }
-*/         	   setImageBitmap(background.getBitmap());
-           	 invalidate();
+            mHandler.post(() -> {
+                setColorFilter(combinedColor);
+                BitmapDrawable background = new BitmapDrawable(getResources(), blur);
+                setImageBitmap(background.getBitmap());
+                invalidate();
             });
         }
+    }
+
+    /**
+     * Set the alpha component of {@code color} to be {@code alpha}.
+     */
+    public static int setAlphaComponent(int color, int alpha) {
+        if (alpha < 0 || alpha > 255) {
+            throw new IllegalArgumentException("alpha must be between 0 and 255.");
+        }
+        return (color & 0x00ffffff) | (alpha << 24);
     }
 
     public static int[] getRealDimensionDisplay() {
