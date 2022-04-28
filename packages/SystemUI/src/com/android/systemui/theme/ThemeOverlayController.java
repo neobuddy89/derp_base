@@ -680,13 +680,8 @@ public class ThemeOverlayController extends SystemUI implements Dumpable {
                             Collectors.joining(", ")));
         }
 
-        boolean nightMode = (mContext.getResources().getConfiguration().uiMode
-                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-        boolean isBlackTheme = mSecureSettings.getInt(Settings.Secure.SYSTEM_BLACK_THEME, 0) == 1
-                                && nightMode;
-        boolean isNusantaraClearTheme  = mSecureSettings.getInt(Settings.Secure.SYSTEM_NUSANTARA_THEME, 0) == 1
-                                && nightMode;
-
+        boolean isBlackTheme = mSecureSettings.getInt(Settings.Secure.SYSTEM_BLACK_THEME, 0) == 1;
+        boolean isNusantaraClearTheme  = mSecureSettings.getInt(Settings.Secure.SYSTEM_NUSANTARA_THEME, 0) == 1;
         mThemeManager.setIsBlackTheme(isBlackTheme);
         mThemeManager.setIsNusantaraClearTheme(isNusantaraClearTheme);
 
