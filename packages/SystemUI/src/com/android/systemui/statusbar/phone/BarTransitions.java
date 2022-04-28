@@ -392,7 +392,6 @@ public class BarTransitions {
         }
 
         public boolean ishome() {
-            isMusic();
             ActivityManager.RunningTaskInfo runningTaskInfo = ActivityManagerWrapper.getInstance().getRunningTask();
             if (runningTaskInfo == null) {
                 return false;
@@ -401,12 +400,12 @@ public class BarTransitions {
             }
         }
 
-        public boolean isMusic() {
+        public boolean isSettings() {
             ActivityManager.RunningTaskInfo runningTaskInfo = ActivityManagerWrapper.getInstance().getRunningTask();
             if (runningTaskInfo == null) {
                 return false;
             } else {
-                return runningTaskInfo.topActivity.equals("com.sonyericsson.music");
+                return runningTaskInfo.topActivity.getPackageName().equals("com.android.settings");
             }
         }
 
@@ -455,7 +454,7 @@ public class BarTransitions {
         public final synchronized void applyMode(final int mode, boolean animate) {
             mCurrentMode = mode;
             mHandler.post(() -> {
-                int targetColor = (ishome() || ls()) ? getColorTransparent() : getTargetColor(mode);
+                int targetColor = (ishome() || ls() || isSettings()) ? getColorTransparent() : getTargetColor(mode);
                 int targetGradientAlpha = getTargetGradientAlpha(mode);
                 if (targetColor != mCurrentColor || targetGradientAlpha != mCurrentGradientAlpha) {
                     setCurrentColor(targetColor);
@@ -470,7 +469,7 @@ public class BarTransitions {
         }
 
         protected final void generateAnimator(int targetMode) {
-            final int targetColor = (ishome() || ls()) ? getColorTransparent() : getTargetColor(targetMode);
+            final int targetColor = (ishome() || ls() || isSettings()) ? getColorTransparent() : getTargetColor(targetMode);
             final int targetGradientAlpha = getTargetGradientAlpha(targetMode);
             if (targetColor != mCurrentColor || targetGradientAlpha != mCurrentGradientAlpha) {
                 mHandler.post(() -> {
