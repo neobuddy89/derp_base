@@ -110,8 +110,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import com.android.systemui.nad.BlurUtils;
-import com.android.systemui.nad.DisplayUtils;
+import com.android.systemui.derp.BlurUtils;
+import com.android.systemui.derp.DisplayUtils;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintSet;
