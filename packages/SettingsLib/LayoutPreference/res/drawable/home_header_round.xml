@@ -15,8 +15,7 @@
   ~ limitations under the License.
   -->
 <layer-list
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:androidprv="http://schemas.android.com/apk/prv/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape
             android:shape="rectangle">
@@ -30,7 +29,7 @@
         <shape
             android:shape="rectangle">
             <solid
-                android:color="?androidprv:attr/colorSurfaceHeader" />
+                android:color="@color/settingslib_colorSurfaceHeader" />
         </shape>
     </item>
     <item
@@ -50,7 +49,7 @@
                 android:pivotY="4.0"
                 android:rotation="0.0">
                 <path
-                    android:fillColor="?androidprv:attr/colorSurfaceHeader"
+                    android:fillColor="@color/settingslib_colorSurfaceHeader"
                     android:pathData="M8,0H0v8C0,3.6,3.6,0,8,0z" />
             </group>
         </vector>
@@ -72,7 +71,7 @@
                 android:pivotY="4.0"
                 android:rotation="90.0">
                 <path
-                    android:fillColor="?androidprv:attr/colorSurfaceHeader"
+                    android:fillColor="@color/settingslib_colorSurfaceHeader"
                     android:pathData="M8,0H0v8C0,3.6,3.6,0,8,0z" />
             </group>
         </vector>
