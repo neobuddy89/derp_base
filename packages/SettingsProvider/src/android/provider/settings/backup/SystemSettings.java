@@ -151,6 +151,5 @@ public class SystemSettings {
         Settings.System.HEADSET_CONNECT_PLAYER,
         Settings.System.SCREEN_OFF_FOD,
         Settings.System.BATTERY_LEVEL_COLORS,
-        Settings.System.STATUS_BAR_SHOW_ACTIVITY_INDICATORS,
     };
 }
