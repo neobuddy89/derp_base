@@ -49,9 +49,17 @@
                 android:clickable="true"
                 android:ellipsize="marquee"
                 android:focusable="true"
-                android:gravity="center_vertical"
+                android:gravity="start|center_vertical"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.QS.Status.Build"
+                android:visibility="gone" />
+
+            <com.android.systemui.qs.PageIndicator
+                android:id="@+id/footer_page_indicator"
+                android:layout_width="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
                 android:visibility="gone" />
 
             <TextView
@@ -66,24 +74,19 @@
                 android:ellipsize="marquee"
                 android:focusable="true"
                 android:gravity="center"
-                android:layout_gravity="center"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="@dimen/qs_tile_margin_horizontal"
                 android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.QS.Status.Build"
                 android:visibility="gone" />
 
-            <com.android.systemui.qs.PageIndicator
-                android:id="@+id/footer_page_indicator"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:visibility="gone" />
-
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:visibility="gone" />
 
         </LinearLayout>
 
