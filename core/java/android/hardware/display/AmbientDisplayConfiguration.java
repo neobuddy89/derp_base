@@ -227,20 +227,15 @@ public class AmbientDisplayConfiguration {
     }
 
     public boolean alwaysOnEnabledSetting(int user) {
-        final boolean alwaysOnEnabled = Settings.Secure.getIntForUser(
-                mContext.getContentResolver(), Settings.Secure.DOZE_ALWAYS_ON,
-                mAlwaysOnByDefault ? 1 : 0, user) == 1;
+        boolean alwaysOnEnabled = boolSetting(Settings.Secure.DOZE_ALWAYS_ON, user, mAlwaysOnByDefault ? 1 : 0);
         return alwaysOnEnabled && alwaysOnAvailable() && !accessibilityInversionEnabled(user);
     }
 
     public boolean alwaysOnChargingEnabled(int user) {
-        final boolean dozeOnChargeEnabled = Settings.System.getIntForUser(
-                mContext.getContentResolver(), Settings.System.DOZE_ON_CHARGE, 0, user) == 1;
+        final boolean dozeOnChargeEnabled = boolSettingSystem(Settings.System.DOZE_ON_CHARGE, user, 0);
         if (dozeOnChargeEnabled) {
-            final Intent intent = mContext.registerReceiver(null, sIntentFilter);
-            if (intent != null) {
-                return intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0;
-            }
+            final boolean dozeOnChargeEnabledNow = boolSettingSystem(Settings.System.DOZE_ON_CHARGE_NOW, user, 0);
+            return dozeOnChargeEnabledNow && alwaysOnAvailable() && !accessibilityInversionEnabled(user);
         }
         return false;
     }
