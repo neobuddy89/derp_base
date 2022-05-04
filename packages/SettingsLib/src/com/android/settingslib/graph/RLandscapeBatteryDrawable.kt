@@ -27,6 +27,8 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.provider.Settings.System
+import android.os.UserHandle
 import android.util.PathParser
 import android.util.TypedValue
 
@@ -177,6 +179,11 @@ open class RLandscapeBatteryDrawable(private val context: Context, frameColor: I
     }
 
     init {
+        val setCustomBatteryLevelTint = System.getIntForUser(
+            context.getContentResolver(),
+            System.BATTERY_LEVEL_COLORS, 0, UserHandle.USER_CURRENT
+        ) === 1
+
         val density = context.resources.displayMetrics.density
         intrinsicHeight = (Companion.HEIGHT * density).toInt()
         intrinsicWidth = (Companion.WIDTH * density).toInt()
