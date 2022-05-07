@@ -372,7 +372,7 @@ public abstract class SystemUIDerpFestModule {
 
     @Provides
     @SysUISingleton
-    static NavBarFader provideNavBarFader(NavigationBarController navigationBarController, Handler handler) {
+    static NavBarFader provideNavBarFader(Lazy<NavigationBarController> navigationBarController, Handler handler) {
         return new NavBarFader(navigationBarController, handler);
     }
 
