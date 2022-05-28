@@ -4473,16 +4473,6 @@ public class StatusBar extends SystemUI implements
         KeyboardShortcuts.dismiss();
     }
 
-    protected void setBlockedGesturalNavigation(boolean blocked) {
-        if (getNotificationPanelViewController() != null) {
-            getNotificationPanelViewController().setBlockedGesturalNavigation(blocked);
-            getNotificationPanelViewController().updateSystemUiStateFlags();
-        }
-        if (getNavigationBarView() != null) {
-            getNavigationBarView().setBlockedGesturalNavigation(blocked);
-        }
-    }
-
     /**
      * Dismiss the keyguard then execute an action.
      *
