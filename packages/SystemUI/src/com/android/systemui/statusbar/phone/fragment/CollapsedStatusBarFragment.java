@@ -79,8 +79,6 @@ import com.android.systemui.statusbar.policy.Clock;
 import com.android.systemui.statusbar.policy.EncryptionHelper;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
 
-import com.android.systemui.derp.carrierlabel.CarrierLabel;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -583,7 +581,6 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
 
     public void showCarrierName(boolean animate) {
         if (mCustomCarrierLabel != null) {
-            ((CarrierLabel)mCustomCarrierLabel).updateKeyguardState(false);
             setCarrierLabel(animate);
         }
     }

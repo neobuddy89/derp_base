@@ -16,15 +16,12 @@
 
 package com.android.systemui.derp.carrierlabel;
 
-import android.app.WallpaperColors;
-import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.UserHandle;
@@ -40,7 +37,6 @@ import com.android.internal.util.derp.derpUtils;
 import com.android.internal.telephony.TelephonyIntents;
 
 import com.android.systemui.Dependency;
-import com.android.systemui.colorextraction.SysuiColorExtractor;
 import com.android.systemui.plugins.DarkIconDispatcher;
 import com.android.systemui.plugins.DarkIconDispatcher.DarkReceiver;
 
@@ -54,7 +50,6 @@ public class CarrierLabel extends TextView implements DarkReceiver {
 
     private Context mContext;
     private boolean mAttached;
-    private boolean mKeyguard;
 
     private String mNetworkName = "";
 
@@ -102,31 +97,7 @@ public class CarrierLabel extends TextView implements DarkReceiver {
 
     @Override
     public void onDarkChanged(Rect area, float darkIntensity, int tint) {
-        setCarrierLabelTextColor(DarkIconDispatcher.getTint(area, this, tint));
-    }
-
-    public void updateKeyguardState(boolean keyguard) {
-        if (mKeyguard != keyguard) {
-            mKeyguard = keyguard;
-            setCarrierLabelTextColor(0);
-        }
-    }
-
-    private void setCarrierLabelTextColor(int tint) {
-        int color;
-        if (mKeyguard) {
-            color = supportsDarkText() ? Color.BLACK : Color.WHITE;
-        } else {
-            color = tint;
-        }
-        setTextColor(color);
-    }
-
-    private boolean supportsDarkText() {
-        final SysuiColorExtractor mColorExtractor = Dependency.get(SysuiColorExtractor.class);
-        final WallpaperColors systemColors = mColorExtractor.getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
-        final int hints = systemColors.getColorHints();
-        return (hints & WallpaperColors.HINT_SUPPORTS_DARK_TEXT) != 0;
+        setTextColor(DarkIconDispatcher.getTint(area, this, tint));
     }
 
     private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
