@@ -6483,12 +6483,6 @@ public final class Settings {
         public static final String HEADS_UP_NOTIFICATIONS_THRESHOLD = "heads_up_notifications_threshold";
 
         /**
-         * Whether to launch default music player when headset plugged in
-         * @hide
-         */
-        public static final String HEADSET_CONNECT_PLAYER = "headset_connect_player";
-
-        /**
          * Enable fod detection even when screen is off
          * Default value is 0
          * @hide
@@ -6754,7 +6748,6 @@ public final class Settings {
             PRIVATE_SETTINGS.add(SHOW_APP_VOLUME);
             PRIVATE_SETTINGS.add(SENSOR_BLOCK);
             PRIVATE_SETTINGS.add(LOCK_HIDE_STATUS_BAR);
-            PRIVATE_SETTINGS.add(HEADSET_CONNECT_PLAYER);
             PRIVATE_SETTINGS.add(HIGH_TOUCH_POLLING_RATE_ENABLE);
             PRIVATE_SETTINGS.add(HIGH_TOUCH_SENSITIVITY_ENABLE);
             PRIVATE_SETTINGS.add(BATTERY_LEVEL_COLORS);
